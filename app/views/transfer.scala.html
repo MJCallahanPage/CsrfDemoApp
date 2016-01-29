@@ -1,0 +1,76 @@
+@(transferDetails: Form[bankModel])(implicit request:Request[_],lang: Lang)
+
+@import helper._
+
+@main("Bank Transfer") {
+    <h1>Genuine Transfer</h1>
+    <p>
+        The Genuine Transfer includes a CSRF Token (Synchronizer Token) which play validates against the session. If the token matches then the request
+        is legitimate and actioned.
+    </p>
+
+    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;form</span> <span style="color: #0000CC">action=</span><span style="background-color: #fff0f0">&quot;/transfer?csrfToken=<b>e6734770ca62e0456eb53cf670b55aeaf6c06bff-1454076319918-7a4b687ea285f4272d43c14f</b>&quot;</span> <span style="color: #0000CC">method=</span><span style="background-color: #fff0f0">&quot;POST&quot;</span> <span style="color: #007700">&gt;</span>                              <span style="color: #007700">&lt;label&gt;</span>Account<span style="color: #007700">&lt;/label&gt;</span>
+    <span style="color: #007700">&lt;input</span> <span style="color: #0000CC">type=</span><span style="background-color: #fff0f0">&quot;text&quot;</span> <span style="color: #0000CC">name=</span><span style="background-color: #fff0f0">&quot;Account&quot;</span> <span style="color: #0000CC">id=</span><span style="background-color: #fff0f0">&quot;Account&quot;</span>  <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;label&gt;</span>Amount<span style="color: #007700">&lt;/label&gt;</span>
+    <span style="color: #007700">&lt;input</span> <span style="color: #0000CC">type=</span><span style="background-color: #fff0f0">&quot;text&quot;</span> <span style="color: #0000CC">name=</span><span style="background-color: #fff0f0">&quot;Amount&quot;</span> <span style="color: #0000CC">id=</span><span style="background-color: #fff0f0">&quot;Amount&quot;</span>  <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;button</span> <span style="color: #0000CC">type=</span><span style="background-color: #fff0f0">&quot;submit&quot;</span><span style="color: #007700">&gt;</span>Transfer<span style="color: #007700">&lt;/button&gt;</span>
+    <span style="color: #007700">&lt;/form&gt;</span>
+    </pre></div>
+    <br />
+    <table>
+        <tr>
+            <td class="comment" style="text-align:right">
+                @form(CSRF(routes.CSRFController.transfer)) {
+
+                    @input(transferDetails("Account"),
+                        '_label -> "",
+                        '_help -> ""
+                    ) { (id, name, value, args) =>
+                        <label>Account</label>
+                        <input type="text" name="@name" id="@id" @toHtmlArgs(args) />
+                    }
+
+                    @input(transferDetails("Amount"),
+                        '_label -> "",
+                        '_help -> ""
+                    ) { (id, name, value, args) =>
+                        <label>Amount</label>
+                        <input type="text" name="@name" id="@id" @toHtmlArgs(args) />
+                    }
+
+                    <button type="submit">Transfer</button>
+                }
+            </td>
+        </tr>
+    </table>
+
+
+    <h1>Malicious Forged Transfer</h1>
+
+    <p>
+        An attacker could try and create a hidden form like the one below, with a button that looks innocent enough. Because the attackers form does not include
+        the CSRF token the server throws a missing token exception. Thus avoiding a malicious bank transfer to their account.
+    </p>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;form</span> <span style="color: #0000CC">action=</span><span style="background-color: #fff0f0">&quot;/transfer&quot;</span> <span style="color: #0000CC">method=</span><span style="background-color: #fff0f0">&quot;post&quot;</span><span style="color: #007700">&gt;</span>
+<span style="color: #007700">&lt;input</span> <span style="color: #0000CC">type=</span><span style="background-color: #fff0f0">&quot;hidden&quot;</span> <span style="color: #0000CC">name=</span><span style="background-color: #fff0f0">&quot;Account&quot;</span> <span style="color: #0000CC">id=</span><span style="background-color: #fff0f0">&quot;Account&quot;</span> <span style="color: #0000CC">value=</span><span style="background-color: #fff0f0">&quot;1114533&quot;</span> <span style="color: #007700">/&gt;</span>
+<span style="color: #007700">&lt;input</span> <span style="color: #0000CC">type=</span><span style="background-color: #fff0f0">&quot;hidden&quot;</span> <span style="color: #0000CC">name=</span><span style="background-color: #fff0f0">&quot;Amount&quot;</span> <span style="color: #0000CC">id=</span><span style="background-color: #fff0f0">&quot;Amount&quot;</span> <span style="color: #0000CC">value=</span><span style="background-color: #fff0f0">&quot;2000&quot;</span> <span style="color: #007700">/&gt;</span>
+<span style="color: #007700">&lt;button</span> <span style="color: #0000CC">type=</span><span style="background-color: #fff0f0">&quot;submit&quot;</span><span style="color: #007700">&gt;</span>See Your Pictures!<span style="color: #007700">&lt;/button&gt;</span>
+<span style="color: #007700">&lt;/form&gt;</span>
+</pre></div>
+
+<br />
+
+    <table>
+        <tr>
+            <td style="text-align:right">
+                <form action="@routes.CSRFController.transfer" method="post">
+                    <input type="hidden" name="Account" id="Account" value="1114533" />
+                    <input type="hidden" name="Amount" id="Amount" value="2000" />
+                    <button type="submit">See Your Pictures!</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+}
